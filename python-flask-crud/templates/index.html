@@ -2,22 +2,35 @@
 {% block content %}
 <h1>Items</h1>
 
-<table>
-    <tr>
-        <th>Name</th>
-        <th>Description</th>
-        <th>Actions</th>
-    </tr>
+<form method="GET">
+    <input type="text" name="search" placeholder="Search..." value="{{ search }}">
+    <button type="submit">Search</button>
+</form>
 
+<table>
+    <tr><th>Name</th><th>Description</th><th>Actions</th></tr>
     {% for item in items %}
     <tr>
         <td>{{ item.name }}</td>
         <td>{{ item.description }}</td>
         <td>
             <a href="/update/{{ item.id }}">Edit</a>
-            <a href="/delete/{{ item.id }}" onclick="return confirm('Delete item?');">Delete</a>
+            <a href="/delete/{{ item.id }}">Delete</a>
         </td>
     </tr>
     {% endfor %}
 </table>
+
+<div class="pagination">
+    {% if page > 1 %}
+    <a href="?page={{ page-1 }}&search={{ search }}">Prev</a>
+    {% endif %}
+
+    <span>Page {{ page }} of {{ pages }}</span>
+
+    {% if page < pages %}
+    <a href="?page={{ page+1 }}&search={{ search }}">Next</a>
+    {% endif %}
+</div>
+
 {% endblock %}

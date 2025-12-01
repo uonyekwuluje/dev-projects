@@ -1,40 +1,56 @@
 from flask import Flask, render_template, request, redirect, url_for
 from models import db, Item
+from api import api
+import os
 
 app = Flask(__name__)
 
-# Update with your actual database credentials
-app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://pgadmin:password@localhost/cruddb"
+app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv(
+    "DATABASE_URL",
+    "postgresql://pgadmin:password@localhost/cruddb"
+)
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db.init_app(app)
 
-# Create tables automatically
 with app.app_context():
     db.create_all()
 
+app.register_blueprint(api, url_prefix="/api")
 
-# --- READ ---
+
+# --- Web UI (same as before) ----
+
 @app.route("/")
 def index():
-    items = Item.query.all()
-    return render_template("index.html", items=items)
+    search = request.args.get("search", "")
+    page = int(request.args.get("page", 1))
+    per_page = 5
+
+    query = Item.query
+    if search:
+        query = query.filter(Item.name.ilike(f"%{search}%"))
+
+    pagination = query.paginate(page=page, per_page=per_page, error_out=False)
+
+    return render_template("index.html", items=pagination.items,
+                           page=page, pages=pagination.pages,
+                           search=search)
 
 
-# --- CREATE ---
 @app.route("/create", methods=["GET", "POST"])
 def create():
     if request.method == "POST":
-        name = request.form["name"]
-        description = request.form["description"]
-        new_item = Item(name=name, description=description)
-        db.session.add(new_item)
+        item = Item(
+            name=request.form["name"],
+            description=request.form["description"]
+        )
+        db.session.add(item)
         db.session.commit()
         return redirect(url_for("index"))
     return render_template("create.html")
 
 
-# --- UPDATE ---
 @app.route("/update/<int:id>", methods=["GET", "POST"])
 def update(id):
     item = Item.query.get_or_404(id)
@@ -46,7 +62,6 @@ def update(id):
     return render_template("update.html", item=item)
 
 
-# --- DELETE ---
 @app.route("/delete/<int:id>")
 def delete(id):
     item = Item.query.get_or_404(id)
@@ -56,4 +71,4 @@ def delete(id):
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", debug=True)
