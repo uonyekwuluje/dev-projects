@@ -1,0 +1,45 @@
+body {
+    font-family: Arial, sans-serif;
+    background: #f3f3f3;
+}
+
+nav {
+    background: #333;
+    padding: 10px;
+}
+
+nav a {
+    color: white;
+    margin-right: 15px;
+    text-decoration: none;
+}
+
+.container {
+    margin: 20px auto;
+    width: 70%;
+    background: white;
+    padding: 20px;
+    border-radius: 5px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+table tr th, table tr td {
+    border: 1px solid #ddd;
+    padding: 10px;
+}
+
+button {
+    background: #007BFF;
+    padding: 10px;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #0056b3;
+}

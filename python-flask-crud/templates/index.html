@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Items</h1>
+
+<table>
+    <tr>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Actions</th>
+    </tr>
+
+    {% for item in items %}
+    <tr>
+        <td>{{ item.name }}</td>
+        <td>{{ item.description }}</td>
+        <td>
+            <a href="/update/{{ item.id }}">Edit</a>
+            <a href="/delete/{{ item.id }}" onclick="return confirm('Delete item?');">Delete</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}
