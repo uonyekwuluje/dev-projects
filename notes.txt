@@ -1,3 +1,25 @@
+
+# Get VPC ID
+def get_vpc_id_by_tag(tag_key, tag_value):
+    ec2_client = boto3.client('ec2')
+
+    response = ec2_client.describe_vpcs(
+        Filters=[
+            {
+                'Name': f'tag:{tag_key}',
+                'Values': [tag_value]
+            },
+        ]
+    )
+
+    vpcs = response.get('Vpcs', [])
+    if vpcs:
+        return vpcs[0]['VpcId']
+    else:
+        return None
+
+
+
 class TestSecurityGroup(unittest.TestCase):
     @mock_aws
     def test_vpc(self):
