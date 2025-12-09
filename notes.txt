@@ -1,0 +1,17 @@
+class TestSecurityGroup(unittest.TestCase):
+    @mock_aws
+    def test_vpc(self):
+        cf = boto3.client("cloudformation")
+        ec2_client = boto3.client("ec2")  
+
+        template_body = cvpc('stg1', 'us-east-1', 'vpc-stack', 'test-vpc-stack')
+        cf.create_stack(StackName='test-vpc-stack', TemplateBody=template_body)
+
+        vpc_id = get_vpc_id_by_tag("Name", "stg1")
+        vpcs = ec2_client.describe_vpcs(VpcIds=[vpc_id])
+        tags = vpcs['Vpcs'][0]['Tags']
+
+        found_name = next(tag['Value'] for tag in tags if tag['Key'] == 'Name')
+        self.assertEqual(found_name, 'stg1')
+        self.assertIn('stg1', found_name)
+
